@@ -28,6 +28,12 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.CheckActivity"
+            android:exported="false"
+            android:label="@string/check_title"
+            android:parentActivityName=".ui.MainActivity" />
+
     </application>
 
 </manifest>

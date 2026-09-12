@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.2.0
+
+The list itself. The app now shows which Fassistant apps exist, what each has released, and what is
+on the phone.
+
+- Apps are found by asking GitHub which of the owner's public repositories carry the topic
+  `fassistant`. That topic is the whole list: shipping a new app means tagging its repository, and
+  the catalogue picks it up on the next refresh with nothing edited and nothing re-released.
+- Each row says what it would do — install, update, or nothing, because it is current.
+- GitHub allows sixty unauthenticated requests an hour and counts them per network address, not per
+  device, so a laptop on the same connection can use up the phone's allowance. That turned up
+  during development rather than in theory. The published manifests are saved on disk, a refresh
+  that cannot reach GitHub falls back to them with the age shown, and being rate-limited is
+  reported as itself rather than as a failure.
+- What is installed is read fresh every time and never saved, because it changes underneath the app
+  whenever something is installed or removed.
+- The download check moved to its own screen, reached from the button on the list.
+- The two certificate steps in that check now report success as well as failure. They were silent
+  when they passed, which made a working check look like a broken one.
+
+Not here yet: the buttons that actually install. A row says what it would do; doing it is next, and
+needs the permission that lets an app install apps.
+
 ## 0.1.0
 
 Milestone one: the download check.
@@ -21,5 +44,3 @@ an error that reads like a server problem rather than a trust-store one.
   this phone or merely redundant — from one install, with nothing plugged in.
 - A button that sends the report, since these phones are never connected to a computer and the
   screen is otherwise the only place the answer exists.
-
-Not here yet: the catalogue itself. This release exists to answer one question on a real phone.

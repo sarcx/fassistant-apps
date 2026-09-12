@@ -785,14 +785,18 @@
       <div class="stone">
         <div class="n">2</div>
         <div class="bd">
-          <h3>Discovery by topic</h3>
-          <p>Tag <code>fassistant-android</code> with the topic, then have the app call the repo
-            listing, keep the tagged repos, and read one manifest each. No interface yet &mdash;
-            this is a log line per app. Cache the parsed list on disk so a rate-limited or offline
-            launch still shows something.</p>
-          <div class="proof"><b>Proof</b>The app logs one app. Tag a second repo, refresh, and it
-            logs two, with nothing rebuilt and no file edited. In aeroplane mode it still logs the
-            list it saw last time.</div>
+          <h3>Discovery by topic <span class="pill p-check">built, awaiting the phone</span></h3>
+          <p>Ask GitHub which repositories carry the topic, read one manifest each, and compare
+            with what is on the phone. With no cable there is no log to read, so the result goes on
+            screen as the list itself &mdash; one row per app, saying what it would do.</p>
+          <p>The saved-list fallback stopped being a nicety during development. GitHub allows sixty
+            unauthenticated requests an hour and counts them <i>per network address</i>, so a laptop
+            testing on the same connection uses up the phone's allowance. Being rate-limited is
+            therefore an ordinary state, and the app names it rather than reporting a failure.</p>
+          <div class="proof"><b>Proof</b>With both repositories tagged, the list shows two apps and
+            correctly reports the watchdog as installed or not. Tagging a third makes it three, with
+            nothing rebuilt and no file edited. With no connection it shows the saved list and how
+            old it is.</div>
         </div>
       </div>
 

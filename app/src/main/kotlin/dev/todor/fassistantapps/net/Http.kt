@@ -14,6 +14,17 @@ import javax.net.ssl.SSLSocketFactory
  * as the scheme changes. A "latest release" address is a chain of them that ends on a different
  * host, so an implementation that gave up at the first hop would fetch nothing at all.
  */
+/**
+ * GitHub allows sixty unauthenticated requests an hour, counted per network address rather than
+ * per device. A laptop on the same connection can therefore use up the phone's allowance, so this
+ * is an ordinary thing to meet rather than an edge case — and the catalogue answers it by showing
+ * the list it saved last time.
+ *
+ * [resetAt] is the second, in Unix time, at which the allowance returns. Absent if GitHub did not
+ * say.
+ */
+class RateLimited(val resetAt: Long?) : IllegalStateException("GitHub is rate-limiting this network")
+
 object Http {
 
     private const val TIMEOUT_MS = 20_000
@@ -54,7 +65,13 @@ object Http {
                 }
 
                 else -> {
+                    val exhausted = connection.getHeaderField("X-RateLimit-Remaining") == "0"
+                    val resetAt = connection.getHeaderField("X-RateLimit-Reset")?.toLongOrNull()
                     connection.disconnect()
+                    // Worth telling apart from any other refusal: it is not a fault, it passes on
+                    // its own, and it is shared by everything on this network rather than caused
+                    // by the phone.
+                    if (exhausted && (status == 403 || status == 429)) throw RateLimited(resetAt)
                     throw IllegalStateException("${URL(target).host} said $status")
                 }
             }

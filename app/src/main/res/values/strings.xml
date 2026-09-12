@@ -2,6 +2,27 @@
 <resources>
     <string name="app_name">fassistant-apps</string>
 
+    <!-- The list -->
+    <string name="catalogue_loading">Looking for your apps…</string>
+    <string name="catalogue_refresh">Refresh</string>
+    <string name="catalogue_live">%1$s, just refreshed</string>
+    <string name="catalogue_cached">%1$s, saved %2$s. Could not reach GitHub: %3$s</string>
+    <string name="catalogue_rate_limited">%1$s, saved %2$s. GitHub is limiting this network — it allows 60 checks an hour, shared by everything on your connection. It will clear on its own.</string>
+    <string name="catalogue_rate_limited_empty">GitHub is limiting this network, and there is no saved list to fall back on. It allows 60 checks an hour, shared by everything on your connection. Try again shortly.</string>
+    <string name="catalogue_empty">No apps found. Add the topic \"fassistant\" to a repository and refresh.</string>
+
+    <plurals name="catalogue_count">
+        <item quantity="one">%d app</item>
+        <item quantity="other">%d apps</item>
+    </plurals>
+
+    <!-- What each row can say -->
+    <string name="standing_install">Not installed · %1$s available</string>
+    <string name="standing_update">Installed %1$s · %2$s available</string>
+    <string name="standing_current">Installed %1$s · up to date</string>
+    <string name="standing_unidentified">%1$s available · its release does not say which app it is, so this cannot tell whether it is installed</string>
+    <string name="standing_broken">%1$s · %2$s</string>
+
     <!-- Download check -->
     <string name="check_title">Download check</string>
     <string name="check_intro">GitHub serves release files from a host whose certificate Android 7.0 cannot verify on its own. This screen downloads a real release and reports what happened, so the phone answers the question rather than the documentation.</string>

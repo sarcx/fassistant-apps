@@ -57,13 +57,15 @@ class DownloadCheck(private val context: Context) {
 
         if (!step(report, "Reaching api.github.com") { "${Http.text(listingUrl).length} bytes of JSON" }) return
 
-        // The same fetch, twice, differing only in which authorities are believed.
+        // The same fetch, twice, differing only in which authorities are believed. Both outcomes
+        // are reported: a step that says nothing on success reads as one that did not run.
         val withoutBundled = attempt(report, "Fetching a release manifest, phone's certificates only") {
             Http.text(manifestUrl, ssl = TrustConfig.systemOnly()).length
-        }
+        }?.also { report("  accepted, $it bytes") }
+
         val withBundled = attempt(report, "Fetching it again, adding the root this app carries") {
             Http.text(manifestUrl, ssl = TrustConfig.withBundledRoot(context)).length
-        }
+        }?.also { report("  accepted, $it bytes") }
 
         if (withBundled == null) {
             report("")
