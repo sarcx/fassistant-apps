@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">fassistant-apps</string>
+
+    <!-- Download check -->
+    <string name="check_title">Download check</string>
+    <string name="check_intro">GitHub serves release files from a host whose certificate Android 7.0 cannot verify on its own. This screen downloads a real release and reports what happened, so the phone answers the question rather than the documentation.</string>
+    <string name="check_run">Run the check</string>
+    <string name="check_running">Running…</string>
+    <string name="check_share">Send the report</string>
+</resources>

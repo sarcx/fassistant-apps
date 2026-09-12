@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  GitHub serves release assets from release-assets.githubusercontent.com, whose certificate chains
+  up to ISRG Root X1. Android only started shipping that root in 7.1.1: it is absent from 7.0's
+  trust store, which was checked against the AOSP system/ca-certificates tree at both tags. On a
+  7.0 phone the app would list every release correctly and then fail every download with a
+  certificate error, which reads as a server problem rather than a trust-store one.
+
+  So the root travels with the app, in addition to the system store rather than instead of it. It
+  costs about 1.4 KB, and on 7.1.1 and later the bundled copy is simply redundant.
+
+  This is the base config rather than one pinned to githubusercontent.com because the host that
+  serves the bytes is GitHub's to change — it was objects.githubusercontent.com until recently —
+  and an extra public root is harmless on every host, while a missing one is a silent failure.
+
+  Whether a given phone actually needs it is answered on the phone: the download check builds both
+  trust configurations itself and runs the same fetch through each. See net/TrustConfig.kt.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="@raw/isrg_root_x1" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

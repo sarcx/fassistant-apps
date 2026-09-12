@@ -1,0 +1,24 @@
+# Copy to local.properties and fill in. That file is gitignored on purpose: the signing key is
+# exactly what installed copies use to decide an update is genuine.
+
+sdk.dir=/path/to/android/sdk
+
+# Only needed to build an APK that can upgrade an installed copy in place. Without these the
+# build still works, signed with the local debug key.
+#
+# This is the same key the other Fassistant apps use, and that is load-bearing here rather than
+# tidy: the catalogue refuses to install a download whose signing certificate does not match its
+# own, which is how it tells a real Fassistant release from anything else served at that URL.
+fapps.keystore=/path/outside/this/repo/fassistant.jks
+fapps.keystorePassword=
+fapps.keyAlias=
+fapps.keyPassword=
+
+# Whose repositories to list. Only public repositories are read, and only those carrying the
+# topic named below.
+fapps.owner=sarcx
+fapps.topic=fassistant
+
+# Where the built app looks for its own updates. CI sets this to the repository's latest
+# release. Empty switches self-update off.
+fapps.updateUrl=

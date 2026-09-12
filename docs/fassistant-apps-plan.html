@@ -1,0 +1,990 @@
+<title>Building fassistant-apps</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --paper: #f1f2f5;
+    --surface: #ffffff;
+    --surface-2: #e9ebf0;
+    --ink: #15171c;
+    --ink-2: #565c68;
+    --ink-3: #7d8492;
+    --line: #d5d8e0;
+    --line-2: #c2c6d1;
+    --accent: #0e767f;
+    --accent-2: #0a5b62;
+    --accent-soft: #dcecee;
+    --warn: #8c6210;
+    --warn-soft: #f6eeda;
+    --risk: #a1364a;
+    --risk-soft: #f7e2e5;
+    --ok: #2b7048;
+    --ok-soft: #e0efe6;
+    --code-bg: #eaecf1;
+    --code-ink: #22252c;
+
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #12141a;
+      --surface: #1a1d24;
+      --surface-2: #22262f;
+      --ink: #e5e8ee;
+      --ink-2: #9ba3b1;
+      --ink-3: #7c8492;
+      --line: #2b303a;
+      --line-2: #3a404c;
+      --accent: #48c3cd;
+      --accent-2: #6fd6de;
+      --accent-soft: #0f3136;
+      --warn: #d8a94f;
+      --warn-soft: #33290f;
+      --risk: #e58292;
+      --risk-soft: #36171d;
+      --ok: #63c58c;
+      --ok-soft: #14301f;
+      --code-bg: #0e1116;
+      --code-ink: #dce1e9;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #12141a;
+    --surface: #1a1d24;
+    --surface-2: #22262f;
+    --ink: #e5e8ee;
+    --ink-2: #9ba3b1;
+    --ink-3: #7c8492;
+    --line: #2b303a;
+    --line-2: #3a404c;
+    --accent: #48c3cd;
+    --accent-2: #6fd6de;
+    --accent-soft: #0f3136;
+    --warn: #d8a94f;
+    --warn-soft: #33290f;
+    --risk: #e58292;
+    --risk-soft: #36171d;
+    --ok: #63c58c;
+    --ok-soft: #14301f;
+    --code-bg: #0e1116;
+    --code-ink: #dce1e9;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: 3.5rem 1.5rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  p, ul, ol { max-width: var(--measure); }
+  p { margin: 0; }
+  ul, ol { margin: 0; padding-left: 1.35rem; }
+  li { margin-bottom: 0.4rem; }
+  li:last-child { margin-bottom: 0; }
+
+  .eyebrow {
+    font-family: var(--display);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(2rem, 5vw, 2.9rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0.35rem 0 0;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 1.09rem;
+    color: var(--ink-2);
+    margin-top: 0.9rem;
+    max-width: 60ch;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--ink);
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  section { display: flex; flex-direction: column; gap: 1.1rem; }
+
+  header.masthead { border-bottom: 1px solid var(--line); padding-bottom: 2rem; }
+
+  /* ---- summary ---- */
+
+  .summary {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    padding: 1.6rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  .summary p { max-width: 70ch; }
+
+  /* ---- pills ---- */
+
+  .pill {
+    display: inline-block;
+    font-family: var(--display);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    padding: 0.16rem 0.5rem;
+    border-radius: 2px;
+    border: 1px solid;
+    white-space: nowrap;
+    vertical-align: 0.08em;
+  }
+  .p-check { color: var(--ok); background: var(--ok-soft); border-color: var(--ok); }
+  .p-probe { color: var(--warn); background: var(--warn-soft); border-color: var(--warn); }
+  .p-risk { color: var(--risk); background: var(--risk-soft); border-color: var(--risk); }
+  .p-pick { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); }
+
+  .pill-row { display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center; }
+
+  /* ---- tables ---- */
+
+  .scroller { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 34rem;
+    font-size: 0.9rem;
+  }
+  caption {
+    caption-side: bottom;
+    text-align: left;
+    color: var(--ink-3);
+    font-size: 0.82rem;
+    padding: 0.7rem 1rem 0;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  thead th {
+    font-family: var(--display);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line-2);
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tr.chosen td { background: var(--accent-soft); }
+  tr.chosen td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* ---- code ---- */
+
+  pre {
+    margin: 0;
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    color: var(--code-ink);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.65;
+    padding: 1rem 1.15rem;
+    overflow-x: auto;
+    tab-size: 2;
+  }
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--code-bg);
+    padding: 0.08em 0.32em;
+    border-radius: 2px;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  .cap {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--ink-3);
+    margin-top: 0.4rem;
+  }
+  .snippet { display: flex; flex-direction: column; }
+  pre .hl { color: var(--accent); font-weight: 500; }
+  pre .cm { color: var(--ink-3); }
+
+  /* ---- figures ---- */
+
+  figure {
+    margin: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 1.4rem 1.4rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  figure .svgbox { overflow-x: auto; }
+  figure svg { display: block; max-width: 100%; height: auto; min-width: 30rem; color: var(--ink); }
+  figcaption { color: var(--ink-2); font-size: 0.88rem; max-width: 72ch; }
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  svg .bx { fill: var(--surface); stroke: currentColor; stroke-width: 1.25; }
+  svg .bx-a { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+  svg .bx-r { fill: var(--risk-soft); stroke: var(--risk); stroke-width: 1.5; stroke-dasharray: 5 3; }
+  svg .bx-w { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.5; }
+  svg .band { fill: none; stroke: var(--line-2); stroke-width: 1; stroke-dasharray: 4 4; }
+  svg .ln { stroke: currentColor; stroke-width: 1.4; fill: none; }
+  svg .ln-thin { stroke: var(--line-2); stroke-width: 1; fill: none; }
+  svg .t { fill: currentColor; font-family: "IBM Plex Sans", sans-serif; font-size: 13px; }
+  svg .t-b { fill: currentColor; font-family: "Archivo", sans-serif; font-size: 13.5px; font-weight: 600; }
+  svg .t-s { fill: var(--ink-2); font-family: "IBM Plex Sans", sans-serif; font-size: 11.5px; }
+  svg .t-m { fill: var(--accent); font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+  svg .t-r { fill: var(--risk); font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+  svg .t-lbl { fill: var(--ink-3); font-family: "Archivo", sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.11em; }
+
+  /* ---- milestones ---- */
+
+  .stones { display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .stone {
+    background: var(--surface);
+    padding: 1.25rem 1.4rem;
+    display: grid;
+    grid-template-columns: 2.6rem 1fr;
+    gap: 0 1.1rem;
+    align-items: start;
+  }
+  .stone .n {
+    font-family: var(--display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .stone .bd { display: flex; flex-direction: column; gap: 0.6rem; min-width: 0; }
+  .stone h3 { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; }
+  .stone p { max-width: 74ch; font-size: 0.94rem; }
+  .proof {
+    border-left: 2px solid var(--accent);
+    padding-left: 0.85rem;
+    font-size: 0.88rem;
+    color: var(--ink-2);
+  }
+  .proof b { font-family: var(--display); font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); display: block; }
+
+  /* ---- q&a ---- */
+
+  .qa { display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .q { background: var(--surface); padding: 1.15rem 1.4rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .q p { font-size: 0.94rem; max-width: 74ch; }
+  .rec { font-size: 0.94rem; max-width: 74ch; }
+  .rec b { color: var(--accent); font-family: var(--display); font-weight: 600; }
+
+  details {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 0.85rem 1.15rem;
+  }
+  details[open] { padding-bottom: 1.15rem; }
+  summary {
+    cursor: pointer;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+  summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  details > *:not(summary) { margin-top: 0.9rem; }
+
+  .note {
+    background: var(--warn-soft);
+    border: 1px solid var(--warn);
+    padding: 1rem 1.25rem;
+    font-size: 0.92rem;
+  }
+  .note p { max-width: 74ch; }
+  .note strong { color: var(--warn); }
+
+  footer.end {
+    border-top: 1px solid var(--line);
+    padding-top: 1.5rem;
+    color: var(--ink-3);
+    font-size: 0.85rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  @media (max-width: 34rem) {
+    .stone { grid-template-columns: 1fr; gap: 0.6rem; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Execution plan &middot; new repo</p>
+    <h1>Building fassistant-apps</h1>
+    <p class="standfirst">One screen listing every Fassistant app, with install and update in the
+      row. Seven milestones, and one certificate problem that has to be solved before anything else
+      is worth writing.</p>
+  </header>
+
+  <div class="summary">
+    <p><b>What.</b> A sideloaded Android app whose only job is to show what exists in the Fassistant
+      family and get it onto the phone. Each row is one app: its name, the version installed against
+      the version released, and a single button that says <i>Install</i>, <i>Update</i> or
+      <i>Open</i>. No more hunting through GitHub for a release page.</p>
+    <p><b>How.</b> Nothing new has to be invented, because every Fassistant repo already publishes
+      exactly the file this needs. Each one cuts a single release carrying its APK and an
+      <code>update.json</code> naming the version and checksum, at an address that never changes.
+      The catalogue asks GitHub which of your repos carry the topic <code>fassistant</code>, reads
+      one manifest per repo, and compares each against what is installed. Adding an app to the
+      catalogue is therefore one command: tag the repo.</p>
+    <p><b>The one real obstacle is a root certificate, and it is already confirmed.</b> GitHub
+      serves release files from a host whose certificate chains to ISRG Root X1. That root shipped
+      in Android 7.1.1 and is <i>absent</i> from Android 7.0 — checked against the AOSP trust store
+      for both releases, not recalled. On a 7.0 phone the app would list everything and then fail
+      every single download. The fix is small and known: ship the root inside the APK as an extra
+      trust anchor, which Android has supported from exactly the API level this app targets. It is
+      milestone&nbsp;1 because everything else is pointless if downloads do not work.</p>
+    <div class="pill-row">
+      <span class="pill p-pick">Kotlin, zero deps</span>
+      <span class="pill p-pick">minSdk 24</span>
+      <span class="pill p-check">No GitHub token needed</span>
+      <span class="pill p-risk">Android 7.0 needs a bundled root CA</span>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+
+  <section>
+    <h2>What the app actually does, end to end</h2>
+
+    <p>Worth seeing the whole path first, because it explains why the app is small: there is one
+      network call for discovery, one small file per app, and one comparison. Everything else is a
+      list row.</p>
+
+    <figure>
+      <div class="svgbox">
+        <svg viewBox="0 0 880 620" role="img" aria-label="One GitHub API call returns the user's public repos with their topics; those tagged fassistant are kept; each one's release manifest is fetched from a fixed latest-release URL; its version code is compared with the installed package, giving one of three actions — install, update or open.">
+          <defs>
+            <marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 1 L 9 5 L 0 9 z" fill="currentColor"></path>
+            </marker>
+          </defs>
+
+          <rect class="band" x="20" y="14" width="840" height="196" rx="3"></rect>
+          <text class="t-lbl" x="34" y="34">ONCE PER REFRESH</text>
+
+          <rect class="bx" x="190" y="48" width="500" height="56" rx="3"></rect>
+          <text class="t-b" x="440" y="72" text-anchor="middle">Ask GitHub what exists</text>
+          <text class="t-m" x="440" y="92" text-anchor="middle">GET api.github.com/users/sarcx/repos?per_page=100</text>
+
+          <line class="ln" x1="440" y1="104" x2="440" y2="146" marker-end="url(#ar1)"></line>
+          <text class="t-s" x="452" y="130">public repos only, each with its topics</text>
+
+          <rect class="bx-a" x="250" y="148" width="380" height="48" rx="3"></rect>
+          <text class="t-b" x="440" y="170" text-anchor="middle">Keep the ones tagged &ldquo;fassistant&rdquo;</text>
+          <text class="t-s" x="440" y="188" text-anchor="middle">this tag is the whole list &mdash; nothing else to maintain</text>
+
+          <rect class="band" x="20" y="224" width="840" height="306" rx="3"></rect>
+          <text class="t-lbl" x="34" y="244">FOR EACH APP FOUND</text>
+
+          <line class="ln" x1="440" y1="196" x2="440" y2="256" marker-end="url(#ar1)"></line>
+
+          <rect class="bx" x="150" y="258" width="580" height="58" rx="3"></rect>
+          <text class="t-b" x="440" y="282" text-anchor="middle">Read that app&rsquo;s release manifest</text>
+          <text class="t-m" x="440" y="302" text-anchor="middle">/&lt;repo&gt;/releases/latest/download/update.json</text>
+
+          <line class="ln" x1="440" y1="316" x2="440" y2="358" marker-end="url(#ar1)"></line>
+          <text class="t-s" x="452" y="342">two redirects, ending on GitHub&rsquo;s asset host</text>
+
+          <rect class="bx" x="190" y="360" width="500" height="76" rx="3"></rect>
+          <text class="t-b" x="440" y="384" text-anchor="middle">versionCode &middot; versionName &middot; apkUrl &middot; sha256 &middot; notes</text>
+          <text class="t-s" x="440" y="404" text-anchor="middle">already published by both existing apps today</text>
+          <text class="t-s" x="440" y="422" text-anchor="middle">this plan adds two fields: packageName and label</text>
+
+          <line class="ln" x1="440" y1="436" x2="440" y2="476" marker-end="url(#ar1)"></line>
+          <text class="t-s" x="452" y="462">is it on this phone, and at which version?</text>
+
+          <rect class="bx-a" x="190" y="478" width="500" height="48" rx="3"></rect>
+          <text class="t-b" x="440" y="500" text-anchor="middle">Compare with the installed package</text>
+          <text class="t-s" x="440" y="518" text-anchor="middle">every package is visible without QUERY_ALL_PACKAGES at targetSdk 25</text>
+
+          <line class="ln" x1="270" y1="526" x2="160" y2="556" marker-end="url(#ar1)"></line>
+          <line class="ln" x1="440" y1="526" x2="440" y2="556" marker-end="url(#ar1)"></line>
+          <line class="ln" x1="610" y1="526" x2="720" y2="556" marker-end="url(#ar1)"></line>
+
+          <rect class="bx" x="30" y="558" width="250" height="50" rx="3"></rect>
+          <text class="t-b" x="155" y="580" text-anchor="middle">Install</text>
+          <text class="t-s" x="155" y="598" text-anchor="middle">not on this phone</text>
+
+          <rect class="bx-a" x="315" y="558" width="250" height="50" rx="3"></rect>
+          <text class="t-b" x="440" y="580" text-anchor="middle">Update</text>
+          <text class="t-s" x="440" y="598" text-anchor="middle">released code is higher</text>
+
+          <rect class="bx" x="600" y="558" width="250" height="50" rx="3"></rect>
+          <text class="t-b" x="725" y="580" text-anchor="middle">Open</text>
+          <text class="t-s" x="725" y="598" text-anchor="middle">already current</text>
+        </svg>
+      </div>
+      <figcaption><b>One API call, then one small file per app.</b> Discovery costs a single
+        request; the manifests come from GitHub&rsquo;s release CDN and do not count against the API
+        rate limit at all. The <code>latest</code> path resolves to whichever release is newest, so
+        no address in the app ever has to change when an app ships a new version.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ============================================================ -->
+
+  <section>
+    <h2>The certificate problem <span class="pill p-risk">confirmed</span></h2>
+
+    <p>This is the finding that shapes the build, so it goes before the stack discussion. GitHub
+      does not serve everything from one place. The listing and the redirect come from
+      <code>github.com</code>; the actual bytes come from a separate asset host. Those two hosts do
+      not use the same certificate authority, and only one of the two roots is present on Android
+      7.0.</p>
+
+    <figure>
+      <div class="svgbox">
+        <svg viewBox="0 0 880 360" role="img" aria-label="Two certificate chains. The GitHub API and website chain up to USERTrust ECC, which is present in Android 7.0. The release asset host chains up to ISRG Root X1, which is absent from Android 7.0 and present only from 7.1.1.">
+          <defs>
+            <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 1 L 9 5 L 0 9 z" fill="currentColor"></path>
+            </marker>
+          </defs>
+
+          <text class="t-lbl" x="60" y="30">THE LISTING AND THE MANIFESTS</text>
+          <text class="t-lbl" x="480" y="30">THE BYTES THEMSELVES</text>
+
+          <rect class="bx" x="60" y="44" width="340" height="46" rx="3"></rect>
+          <text class="t-b" x="230" y="66" text-anchor="middle">api.github.com &middot; github.com</text>
+          <text class="t-s" x="230" y="83" text-anchor="middle">repo list, and the redirect to the asset</text>
+
+          <rect class="bx" x="480" y="44" width="340" height="46" rx="3"></rect>
+          <text class="t-b" x="650" y="66" text-anchor="middle">release-assets.githubusercontent.com</text>
+          <text class="t-s" x="650" y="83" text-anchor="middle">serves a *.github.io certificate</text>
+
+          <line class="ln" x1="230" y1="90" x2="230" y2="110" marker-end="url(#ar2)"></line>
+          <line class="ln" x1="650" y1="90" x2="650" y2="110" marker-end="url(#ar2)"></line>
+
+          <rect class="bx" x="60" y="112" width="340" height="42" rx="3"></rect>
+          <text class="t" x="230" y="138" text-anchor="middle">Sectigo Server Auth CA DV E36 &rarr; Root E46</text>
+
+          <rect class="bx" x="480" y="112" width="340" height="42" rx="3"></rect>
+          <text class="t" x="650" y="138" text-anchor="middle">Let&rsquo;s Encrypt YR1 &rarr; ISRG Root YR</text>
+
+          <line class="ln" x1="230" y1="154" x2="230" y2="174" marker-end="url(#ar2)"></line>
+          <line class="ln" x1="650" y1="154" x2="650" y2="174" marker-end="url(#ar2)"></line>
+
+          <rect class="bx-a" x="60" y="176" width="340" height="52" rx="3"></rect>
+          <text class="t-b" x="230" y="198" text-anchor="middle">USERTrust ECC Certification Authority</text>
+          <text class="t-m" x="230" y="217" text-anchor="middle">04f60c28.0</text>
+
+          <rect class="bx-r" x="480" y="176" width="340" height="52" rx="3"></rect>
+          <text class="t-b" x="650" y="198" text-anchor="middle">ISRG Root X1</text>
+          <text class="t-r" x="650" y="217" text-anchor="middle">6187b673.0</text>
+
+          <line class="ln" x1="230" y1="228" x2="230" y2="248" marker-end="url(#ar2)"></line>
+          <line class="ln" x1="650" y1="228" x2="650" y2="248" marker-end="url(#ar2)"></line>
+
+          <rect class="bx-a" x="60" y="250" width="340" height="76" rx="3"></rect>
+          <text class="t-b" x="230" y="274" text-anchor="middle">Trusted on 7.0 and on 7.1.1</text>
+          <text class="t-s" x="230" y="293" text-anchor="middle">the list and the version numbers arrive</text>
+          <text class="t-s" x="230" y="310" text-anchor="middle">on every phone the app supports</text>
+
+          <rect class="bx-r" x="480" y="250" width="340" height="76" rx="3"></rect>
+          <text class="t-b" x="650" y="274" text-anchor="middle">Trusted from 7.1.1 only</text>
+          <text class="t-s" x="650" y="293" text-anchor="middle">on Android 7.0 every download fails</text>
+          <text class="t-s" x="650" y="310" text-anchor="middle">unless the app carries the root itself</text>
+        </svg>
+      </div>
+      <figcaption><b>The app would look like it worked and then refuse to install anything.</b> The
+        failure is the worst shape available: discovery succeeds, the list renders with correct
+        versions, and only the download throws. Without knowing this in advance it reads as a
+        server problem rather than a trust-store one.</figcaption>
+    </figure>
+
+    <p>The file names under the certificates are how Android stores its trust store &mdash; each
+      root sits in a file named after a hash of its subject. Checking whether a given root is
+      present on a given Android release is therefore a matter of looking for the right filename in
+      that release&rsquo;s AOSP tree, which is what the table below reports.</p>
+
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr>
+            <th>Root certificate</th>
+            <th>Store file</th>
+            <th>Android 7.0</th>
+            <th>Android 7.1.1</th>
+            <th>Needed for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>USERTrust ECC Certification Authority</td>
+            <td class="num">04f60c28.0</td>
+            <td><span class="pill p-check">present</span></td>
+            <td><span class="pill p-check">present</span></td>
+            <td>The repo listing and every redirect</td>
+          </tr>
+          <tr class="chosen">
+            <td>ISRG Root X1 <span class="pill p-risk">the problem</span></td>
+            <td class="num">6187b673.0</td>
+            <td><span class="pill p-risk">absent</span></td>
+            <td><span class="pill p-check">present</span></td>
+            <td>Every manifest and APK download</td>
+          </tr>
+          <tr>
+            <td>DigiCert Global Root G2</td>
+            <td class="num">c90bc37d.0</td>
+            <td><span class="pill p-check">present</span></td>
+            <td><span class="pill p-check">present</span></td>
+            <td>Nothing today &mdash; GitHub has moved off it</td>
+          </tr>
+        </tbody>
+        <caption>Checked directly against the AOSP <code>system/ca-certificates</code> tree at tags
+          <code>android-7.0.0_r1</code> and <code>android-7.1.1_r1</code>, and against the live
+          certificate chains served by both hosts.</caption>
+      </table>
+    </div>
+
+    <h3>The fix, and why it is cheap</h3>
+
+    <p>Android 7.0 introduced per-app network security configuration, which is the same API level
+      this app targets. That is a lucky alignment: the app can declare its own trust anchors in a
+      small XML file, listing the system store <i>and</i> one root shipped inside the APK. The root
+      certificate is about 1.4&nbsp;KB. Nothing else in the app changes, and on 7.1.1 and later the
+      bundled copy is simply redundant.</p>
+
+    <div class="snippet">
+<pre><code>&lt;network-security-config&gt;
+  &lt;domain-config&gt;
+    <span class="cm">&lt;!-- GitHub serves release assets from a host whose chain ends at ISRG Root X1,
+         which Android only started shipping in 7.1.1. On 7.0 the system store cannot
+         verify it, so the root travels with the app. --&gt;</span>
+    &lt;domain includeSubdomains="true"&gt;githubusercontent.com&lt;/domain&gt;
+    &lt;trust-anchors&gt;
+      &lt;certificates src="system" /&gt;
+      <span class="hl">&lt;certificates src="@raw/isrg_root_x1" /&gt;</span>
+    &lt;/trust-anchors&gt;
+  &lt;/domain-config&gt;
+&lt;/network-security-config&gt;</code></pre>
+      <p class="cap">app/src/main/res/xml/network_security_config.xml &mdash; proposed</p>
+    </div>
+
+    <div class="note">
+      <p><strong>This affects the two existing apps too.</strong> Both download their own updates
+        from the same asset host &mdash;
+        <code>app/src/main/kotlin/dev/todor/fassistant/update/UpdateChecker.kt:66</code> &mdash; and
+        <code>fassistant-android</code> declares <code>minSdk 23</code>. On any phone running
+        Android 7.0 or older, self-update has never been able to work and would have failed with a
+        certificate error rather than anything that names the real cause. The same one-file change
+        fixes it in both repos.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+
+  <section>
+    <h2>Stack</h2>
+
+    <p>The interesting decision is not the language &mdash; matching the two sibling repos is
+      obviously right &mdash; it is how the app finds out which apps exist. You have already picked
+      topic-based discovery; the table records what the alternatives cost, so the choice stays
+      legible later.</p>
+
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr>
+            <th>Approach</th>
+            <th>Cost of shipping a new app</th>
+            <th>Against it</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="chosen">
+            <td><b>GitHub topic</b> <span class="pill p-pick">chosen</span><br>Query your public
+              repos, keep those tagged <code>fassistant</code></td>
+            <td>One command on the new repo, and nothing else anywhere</td>
+            <td>Needs one API call per refresh, capped at 60 an hour per network without a token.
+              A manual-refresh app comes nowhere near that, and the last good list is cached on
+              disk anyway.</td>
+          </tr>
+          <tr>
+            <td><b>A curated list file</b><br>A hand-written <code>apps.json</code> published with
+              the catalogue&rsquo;s own release</td>
+            <td>Edit a file, then cut a release of the catalogue itself</td>
+            <td>Exactly the manual step this app exists to remove, moved one level up. It would
+              also work for private repos, which is not a case you have.</td>
+          </tr>
+          <tr>
+            <td><b>A list compiled into the APK</b></td>
+            <td>Edit Kotlin, rebuild, re-release, reinstall on every phone</td>
+            <td>Goes stale the moment a new app ships. Only worth it as an offline fallback, and
+              the disk cache already covers that better.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Everything else follows the two sibling repos without argument: Kotlin, no runtime
+      dependencies past the standard library, no AndroidX, no layout XML &mdash; views are built in
+      code, and lists are a <code>ListView</code> with a <code>BaseAdapter</code>, the pattern
+      already in <code>app/src/main/kotlin/dev/todor/fassistant/ui/PickerActivity.kt:42</code>.
+      <code>targetSdk</code> stays at 25, which matters here for a specific reason rather than
+      habit: an app targeting 25 can see every installed package without asking for
+      <code>QUERY_ALL_PACKAGES</code>, and reading installed versions is half of what this app
+      does.</p>
+  </section>
+
+  <!-- ============================================================ -->
+
+  <section>
+    <h2>One small change to the family&rsquo;s manifest</h2>
+
+    <p>A row cannot say &ldquo;installed 0.4.1, latest 0.5.0&rdquo; without knowing which package on
+      the phone belongs to which repo, and today&rsquo;s <code>update.json</code> does not say. Two
+      fields close that, written by the same <code>dist</code> task that already writes the rest.</p>
+
+    <div class="snippet">
+<pre><code>File(target, "update.json").writeText(
+    """
+    {
+      "versionCode": $appVersionCode,
+      "versionName": "$appVersionName",
+      "apkUrl": "fassistant.apk",
+      "sha256": "$digest",
+<span class="hl">      "packageName": "${android.defaultConfig.applicationId}",</span>
+<span class="hl">      "label": "Fassistant",</span>
+      "notes": "${jsonEscape(releaseNotes(changelog))}"
+    }
+    """.trimIndent() + "\n"
+)</code></pre>
+      <p class="cap">fassistant-android/app/build.gradle.kts:124 &mdash; the two highlighted lines are the change</p>
+    </div>
+
+    <p>The catalogue must not require them, because both existing releases predate this plan. A
+      manifest with no <code>packageName</code> still gets a row and an Install button; what it
+      loses is the ability to say whether the app is already on the phone. That degradation
+      disappears the first time each repo cuts a release.</p>
+
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Status</th>
+            <th>What the catalogue does with it</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">versionCode</td><td><span class="pill p-check">exists</span></td><td>Compared against the installed package to decide Install, Update or Open</td></tr>
+          <tr><td class="num">versionName</td><td><span class="pill p-check">exists</span></td><td>Shown in the row, e.g. &ldquo;0.4.1 &rarr; 0.5.0&rdquo;</td></tr>
+          <tr><td class="num">apkUrl</td><td><span class="pill p-check">exists</span></td><td>Resolved against the manifest&rsquo;s own address, so the host can move</td></tr>
+          <tr><td class="num">sha256</td><td><span class="pill p-check">exists</span></td><td>Checked before the install prompt is ever shown</td></tr>
+          <tr><td class="num">notes</td><td><span class="pill p-check">exists</span></td><td>Expanded under the row, so you can see what an update contains</td></tr>
+          <tr class="chosen"><td class="num">packageName</td><td><span class="pill p-pick">to add</span></td><td>Links a repo to a package on the phone. Without it there is no installed version to show</td></tr>
+          <tr class="chosen"><td class="num">label</td><td><span class="pill p-pick">to add</span></td><td>The name in the row. Falls back to the repo name when missing</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+
+  <section>
+    <h2>Milestones</h2>
+
+    <p>Ordered so the two things that could still go wrong are settled first: whether downloads work
+      on the oldest phone, and whether discovery by topic behaves as documented. Each one runs on a
+      real phone before the next starts.</p>
+
+    <div class="note">
+      <p><strong>The phones are never plugged into anything, and none of them are rooted.</strong>
+        That rules out the usual ways of finding things out, and it changes three milestones.
+        Publishing a release is the <i>only</i> way anything reaches a phone, so the release
+        workflow is not the last step &mdash; it had to be built first, and it was. Anything the
+        app needs to tell us has to appear on its own screen and be sendable from there, because
+        there is no log to read. And the permission that lets the app install apps has to be
+        explained and linked to in the app itself: granting it over a cable is not available.</p>
+    </div>
+
+    <div class="stones">
+
+      <div class="stone">
+        <div class="n">1</div>
+        <div class="bd">
+          <h3>Download something on the oldest phone <span class="pill p-check">built, awaiting the phone</span></h3>
+          <p>A bare app, <code>minSdk 24</code>, one button. It fetches a real
+            <code>update.json</code> from the live release URL and then the APK it names, and checks
+            what it got against the published checksum.</p>
+          <p>Whether the bundled root is doing any work is answered in the same run rather than by
+            building twice: the app constructs both sets of trust anchors itself &mdash; the
+            phone&rsquo;s own certificates, and those plus the root in the APK &mdash; and puts the
+            same fetch through each. One install answers it, which matters when installing means
+            publishing a release and opening a link on the phone.</p>
+          <div class="proof"><b>Proof</b>The 0.5.0 APK lands on the phone and its checksum matches
+            <code>9f2ec955&hellip;</code> from the published manifest &mdash; already confirmed
+            against the live release from a laptop, so a failure on the phone is the phone talking.
+            The screen then says either &ldquo;this phone needs the bundled root&rdquo; or
+            &ldquo;this phone would have managed without it&rdquo;, and a button sends the whole
+            report off the device.</div>
+        </div>
+      </div>
+
+      <div class="stone">
+        <div class="n">2</div>
+        <div class="bd">
+          <h3>Discovery by topic</h3>
+          <p>Tag <code>fassistant-android</code> with the topic, then have the app call the repo
+            listing, keep the tagged repos, and read one manifest each. No interface yet &mdash;
+            this is a log line per app. Cache the parsed list on disk so a rate-limited or offline
+            launch still shows something.</p>
+          <div class="proof"><b>Proof</b>The app logs one app. Tag a second repo, refresh, and it
+            logs two, with nothing rebuilt and no file edited. In aeroplane mode it still logs the
+            list it saw last time.</div>
+        </div>
+      </div>
+
+      <div class="stone">
+        <div class="n">3</div>
+        <div class="bd">
+          <h3>Add the two manifest fields</h3>
+          <p>Extend the <code>dist</code> task in <code>fassistant-android</code> and
+            <code>fassistant-click</code> to write <code>packageName</code> and <code>label</code>,
+            and make the catalogue treat both as optional. Cut a release of each so the published
+            manifests carry them.</p>
+          <div class="proof"><b>Proof</b>The published <code>update.json</code> for both apps
+            contains the new fields, and the catalogue reports an installed version for one and
+            &ldquo;not installed&rdquo; for the other, correctly, on a phone where only one is
+            present.</div>
+        </div>
+      </div>
+
+      <div class="stone">
+        <div class="n">4</div>
+        <div class="bd">
+          <h3>The list screen</h3>
+          <p>The app as you would actually look at it: one row per app with its name, the installed
+            version against the latest, a state pill, and one button whose label matches the state.
+            Icons come from <code>PackageManager</code> for installed apps and a letter tile for the
+            rest. Pull to refresh; tap a row to expand the release notes.</p>
+          <div class="proof"><b>Proof</b>On a phone with the watchdog installed at 0.4.1 and the
+            auto-clicker absent, the screen reads &ldquo;Update to 0.5.0&rdquo; and &ldquo;Install
+            0.1.0&rdquo; without being told anything by hand.</div>
+        </div>
+      </div>
+
+      <div class="stone">
+        <div class="n">5</div>
+        <div class="bd">
+          <h3>Install and update</h3>
+          <p>A <code>PackageInstaller</code> session per app, with the checksum and signing
+            certificate both verified before the system prompt appears &mdash; the same two gates
+            the existing self-update already applies at
+            <code>UpdateChecker.kt:81</code>, which work across apps precisely because the whole
+            family is signed with one key. Plus a single action that updates everything that is out
+            of date, one prompt at a time.</p>
+          <div class="proof"><b>Proof</b>Install puts an absent app on the phone. Update replaces an
+            installed one in place, with no uninstall step and its data intact. A deliberately
+            corrupted manifest checksum stops the install before any prompt is shown.</div>
+        </div>
+      </div>
+
+      <div class="stone">
+        <div class="n">6</div>
+        <div class="bd">
+          <h3>The unknown-sources gate <span class="pill p-probe">two different settings</span></h3>
+          <p>Installing from an app requires permission to install apps, nothing explains that on a
+            fresh phone, and with no cable it cannot be granted from a laptop. So the app has to
+            walk the user there itself &mdash; and where &ldquo;there&rdquo; is depends on the
+            Android version, which is easy to get wrong because the two look nothing alike.</p>
+          <p>On Android 7 the setting is a single global switch covering every app on the phone. On
+            Android 8 and later it is granted per app, and there is a settings screen belonging to
+            this app specifically. A screen that only handles the newer case would send a 7.0 phone
+            &mdash; the one this whole plan is shaped around &mdash; somewhere that does not
+            exist.</p>
+          <div class="proof"><b>Proof</b>On a phone that has never granted it, the screen says so
+            and its link opens the right settings page for that Android version. After granting it
+            by hand, the same screen reports the gate open and an install goes straight to the
+            system prompt.</div>
+        </div>
+      </div>
+
+      <div class="stone">
+        <div class="n">7</div>
+        <div class="bd">
+          <h3>Release it like the others <span class="pill p-check">brought forward, done</span></h3>
+          <p>This was meant to be the last step and became the first, because a release is the only
+            way anything reaches a phone. The version lives in <code>gradle.properties</code>, the
+            <code>dist</code> task builds the APK and its manifest, and the release workflow follows
+            <code>fassistant-android</code>'s. Confirmed locally: the signed build carries the same
+            certificate as the published watchdog, which is what lets the catalogue tell a real
+            Fassistant release from anything else.</p>
+          <p>What is left for the end is the part that depends on the app existing: tagging this
+            repository <code>fassistant</code>, so the catalogue lists and updates itself.</p>
+          <div class="proof"><b>Proof</b>Pushing the tag <code>v0.1.0</code> produces a release
+            carrying both assets, and the catalogue running on the phone shows itself as a row and
+            can update itself from it.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+
+  <section>
+    <h2>Open questions</h2>
+
+    <div class="qa">
+
+      <div class="q">
+        <h3>Which Android 7 is the phone actually running?</h3>
+        <p>It decides whether the bundled root is load-bearing or merely insurance. 7.0 and 7.1.1
+          are both &ldquo;Android 7&rdquo; in conversation and differ on exactly the certificate
+          this app depends on.</p>
+        <p class="rec"><b>Recommendation:</b> ship the bundled root either way &mdash; that part is
+          settled, since it costs about 1.4&nbsp;KB and covers whatever old phone turns up next. The
+          question is now the app's to answer rather than yours: the check screen reports which
+          Android the phone runs, whether its own certificates include that root, and whether the
+          download would have worked without help.</p>
+      </div>
+
+      <div class="q">
+        <h3>Should the same certificate fix go into the two existing apps?</h3>
+        <p>Their self-update downloads from the same host, so on Android 7.0 and older it has never
+          been able to work.</p>
+        <p class="rec"><b>Recommendation:</b> yes, as a small separate change in each repo rather
+          than something bundled into this project. It is the same file, and it is a real bug
+          sitting in shipped code.</p>
+      </div>
+
+      <div class="q">
+        <h3>Does <code>fassistant-click</code> get pushed to GitHub?</h3>
+        <p>It has no remote at the moment, so it has no releases and cannot appear in the catalogue.
+          Without it the app ships with exactly one row in it.</p>
+        <p class="rec"><b>Recommendation:</b> push it and tag <code>v0.1.0</code>. Its release
+          workflow and dist task are already written and its <code>dist/</code> directory already
+          holds a built APK and manifest, so this is the push and the tag, nothing more.</p>
+      </div>
+
+      <div class="q">
+        <h3>Icons for apps that are not installed yet</h3>
+        <p>An app&rsquo;s icon lives inside its APK, so there is nothing to show before it is on the
+          phone short of downloading the APK to look.</p>
+        <p class="rec"><b>Recommendation:</b> a letter tile until installed, the real icon
+          afterwards. If it bothers you later, an <code>iconUrl</code> in the release manifest is an
+          easy addition &mdash; but it is another field for every repo to maintain, for a row you
+          look at once.</p>
+      </div>
+
+      <div class="q">
+        <h3>Should the catalogue check for updates on its own?</h3>
+        <p>The plan has it refresh when opened or pulled. Background checks would mean a scheduled
+          job and a notification, which is a meaningful amount of the machinery the watchdog app
+          exists to contain.</p>
+        <p class="rec"><b>Recommendation:</b> leave it manual for 0.1.0. It is a screen you open
+          when you want to install something; a daily check that notifies you is a separate feature
+          worth deciding on once the app exists.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+
+  <section>
+    <h2>Assumptions</h2>
+
+    <details>
+      <summary>Everything decided rather than asked</summary>
+      <ul>
+        <li><b>Owner and visibility.</b> Repos live under <code>sarcx</code> and stay public, so no
+          token, no login screen, and nothing secret in the APK. Taken from the existing remote and
+          your answer.</li>
+        <li><b>New repo, same family.</b> <code>sarcx/fassistant-apps</code>, application id
+          <code>dev.todor.fassistantapps</code> &mdash; matching how
+          <code>fassistant-click</code> names itself, rather than sitting underneath the watchdog's
+          own package. Signed with the existing key at
+          <code>~/Sites/.fassistant-signing/fassistant.jks</code>. The shared key is not incidental:
+          it is what lets the catalogue reject a download whose signature does not match the family
+          before showing you a prompt.</li>
+        <li><b>Discovery endpoint.</b> The public repo listing for a user, unauthenticated, one
+          request per refresh. Topics come back in that response without any extra header &mdash;
+          verified against the live API.</li>
+        <li><b>minSdk 24, targetSdk 25.</b> 24 because you asked for Android 7, and it happens to be
+          the first release with per-app network security config. 25 for the same reasons the
+          sibling repos give, plus package visibility.</li>
+        <li><b>No AndroidX, no layout XML.</b> Both sibling repos set
+          <code>android.useAndroidX=false</code> and build every view in Kotlin; neither has a
+          <code>res/layout</code> directory at all. This one matches.</li>
+        <li><b>Offline behaviour.</b> The parsed list is cached on disk and shown when GitHub cannot
+          be reached, with the age of the cache visible rather than hidden.</li>
+        <li><b>No root, and no cable.</b> Nothing assumes either. Installing goes through
+          <code>PackageInstaller</code>, which is the route available to an ordinary app, and every
+          answer the app needs to give has to be readable and sendable from its own screen.</li>
+        <li><b>Not in scope.</b> Uninstalling, any app outside the family, private repositories, and
+          background update checks.</li>
+      </ul>
+    </details>
+  </section>
+
+  <footer class="end">
+    <p>Every certificate chain, trust-store entry, API response and file reference in this document
+      was checked against the live services and the repositories at
+      <code>~/Sites/fassistant-android</code> and <code>~/Sites/fassistant-click</code>. Nothing
+      here is written yet.</p>
+  </footer>
+
+</div>
