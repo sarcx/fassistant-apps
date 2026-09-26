@@ -94,7 +94,7 @@ object Catalogue {
     }
 
     /** Where an app publishes what it has released. "latest" makes this address permanent. */
-    private fun manifestUrl(repo: String) =
+    fun manifestUrl(repo: String) =
         "https://github.com/${BuildConfig.CATALOGUE_OWNER}/$repo/releases/latest/download/update.json"
 
     private fun entry(context: Context, repo: String, manifestText: String?): CatalogueEntry {

@@ -23,6 +23,8 @@ import dev.todor.fassistantapps.catalogue.Catalogue
 import dev.todor.fassistantapps.catalogue.CatalogueEntry
 import dev.todor.fassistantapps.catalogue.CatalogueResult
 import dev.todor.fassistantapps.catalogue.Standing
+import dev.todor.fassistantapps.install.Installer
+import dev.todor.fassistantapps.install.Refused
 import java.util.concurrent.Executors
 
 class MainActivity : Activity() {
@@ -31,9 +33,15 @@ class MainActivity : Activity() {
     private val worker = Executors.newSingleThreadExecutor()
 
     private lateinit var status: TextView
+    private lateinit var selfUpdate: LinearLayout
     private lateinit var refreshButton: Button
 
     private var shown: List<CatalogueEntry> = emptyList()
+
+    // This app is in its own list, because its repository carries the family topic like any other.
+    private var ownEntry: CatalogueEntry? = null
+    private var selfUpdateStatus: String? = null
+    private var selfUpdating = false
 
     private val adapter = object : BaseAdapter() {
         override fun getCount() = shown.size
@@ -54,6 +62,13 @@ class MainActivity : Activity() {
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
         }
         column.addView(status)
+
+        selfUpdate = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(20), 0, dp(20), dp(12))
+            visibility = View.GONE
+        }
+        column.addView(selfUpdate)
 
         val list = ListView(this).apply { adapter = this@MainActivity.adapter }
         column.addView(list, LinearLayout.LayoutParams(MATCH_PARENT, 0, 1f))
@@ -82,6 +97,8 @@ class MainActivity : Activity() {
         // What is installed can have changed while this screen was away, and rereading it costs
         // nothing — unlike a refresh, which spends one of sixty requests an hour.
         if (shown.isNotEmpty()) adapter.notifyDataSetChanged()
+        // Coming back from the settings screen that grants permission to install.
+        renderSelfUpdate()
     }
 
     override fun onDestroy() {
@@ -100,6 +117,55 @@ class MainActivity : Activity() {
                 adapter.notifyDataSetChanged()
                 status.text = describe(result)
                 refreshButton.isEnabled = true
+                ownEntry = result.entries.firstOrNull { it.manifest?.packageName == packageName }
+                renderSelfUpdate()
+            }
+        }
+    }
+
+    /** Shown only while this app's own release is newer than what is running. */
+    private fun renderSelfUpdate() {
+        selfUpdate.removeAllViews()
+        val entry = ownEntry?.takeIf { it.standing == Standing.UPDATE }
+        selfUpdate.visibility = if (entry == null) View.GONE else View.VISIBLE
+        if (entry == null) return
+
+        selfUpdate.addView(TextView(this).apply {
+            text = selfUpdateStatus
+                ?: getString(R.string.self_update_available, entry.manifest!!.versionName, entry.installed!!.versionName)
+            setTypeface(null, Typeface.BOLD)
+        })
+        if (selfUpdating) return
+
+        if (Installer.canInstall(this)) {
+            selfUpdate.addView(Button(this).apply {
+                text = getString(R.string.self_update_button)
+                setOnClickListener { updateSelf(entry) }
+            })
+        } else {
+            selfUpdate.addView(TextView(this).apply { text = getString(R.string.install_permission_needed) })
+            selfUpdate.addView(Button(this).apply {
+                text = getString(R.string.install_permission_allow)
+                setOnClickListener { startActivity(Installer.permissionIntent(this@MainActivity)) }
+            })
+        }
+    }
+
+    private fun updateSelf(entry: CatalogueEntry) {
+        selfUpdating = true
+        selfUpdateStatus = getString(R.string.self_update_downloading, entry.manifest!!.versionName)
+        renderSelfUpdate()
+
+        worker.execute {
+            val outcome = runCatching { Installer.handOver(this, Installer.fetch(this, entry)) }
+            ui.post {
+                selfUpdating = false
+                selfUpdateStatus = when (val problem = outcome.exceptionOrNull()) {
+                    null -> getString(R.string.self_update_handed_over)
+                    is Refused -> problem.message
+                    else -> getString(R.string.self_update_failed, problem.message ?: problem.javaClass.simpleName)
+                }
+                renderSelfUpdate()
             }
         }
     }

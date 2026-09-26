@@ -23,6 +23,19 @@
     <string name="standing_unidentified">%1$s available · its release does not say which app it is, so this cannot tell whether it is installed</string>
     <string name="standing_broken">%1$s · %2$s</string>
 
+    <!-- Updating this app -->
+    <string name="self_update_available">A new version of this app is out: %1$s. You have %2$s.</string>
+    <string name="self_update_button">Update this app</string>
+    <string name="self_update_downloading">Downloading %1$s…</string>
+    <string name="self_update_handed_over">Android should now ask you to confirm the update. If you dismissed it, tap the button again.</string>
+    <string name="self_update_failed">The update failed: %1$s</string>
+
+    <!-- Installing -->
+    <string name="install_checksum_failed">The download does not match the checksum its release published, so it was not installed. If a new release came out since the list was loaded, refresh and try again.</string>
+    <string name="install_signature_failed">The download is not signed with the Fassistant key, so it was not installed.</string>
+    <string name="install_permission_needed">Android needs your permission before this app can install anything, including its own updates.</string>
+    <string name="install_permission_allow">Allow installs</string>
+
     <!-- Download check -->
     <string name="check_title">Download check</string>
     <string name="check_intro">GitHub serves release files from a host whose certificate Android 7.0 cannot verify on its own. This screen downloads a real release and reports what happened, so the phone answers the question rather than the documentation.</string>

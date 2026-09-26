@@ -88,9 +88,6 @@ jobs:
           FAPPS_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           FAPPS_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           FAPPS_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          # Baked into the APK so an installed copy knows where to find its successor. The
-          # "latest" path always resolves to the newest release, so this address never changes.
-          FAPPS_UPDATE_URL: https://github.com/${{ github.repository }}/releases/latest/download/update.json
         run: ./gradlew --no-daemon :app:dist
 
       - name: Show what signed the APK

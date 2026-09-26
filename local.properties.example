@@ -18,7 +18,3 @@ fapps.keyPassword=
 # topic named below.
 fapps.owner=sarcx
 fapps.topic=fassistant
-
-# Where the built app looks for its own updates. CI sets this to the repository's latest
-# release. Empty switches self-update off.
-fapps.updateUrl=

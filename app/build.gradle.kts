@@ -29,10 +29,6 @@ val signingKeystore = setting("fapps.keystore", "FAPPS_KEYSTORE")
 val catalogueOwner = setting("fapps.owner", "FAPPS_OWNER") ?: "sarcx"
 val catalogueTopic = setting("fapps.topic", "FAPPS_TOPIC") ?: "fassistant"
 
-// Where the app looks for its own updates. CI points this at the repository's latest release, so
-// a build always knows where it came from. Empty means self-update is switched off.
-val updateManifestUrl = setting("fapps.updateUrl", "FAPPS_UPDATE_URL").orEmpty()
-
 android {
     namespace = "dev.todor.fassistantapps"
     compileSdk = 36
@@ -51,7 +47,6 @@ android {
         versionCode = appVersionCode
         versionName = appVersionName
 
-        buildConfigField("String", "UPDATE_MANIFEST_URL", "\"$updateManifestUrl\"")
         buildConfigField("String", "CATALOGUE_OWNER", "\"$catalogueOwner\"")
         buildConfigField("String", "CATALOGUE_TOPIC", "\"$catalogueTopic\"")
     }

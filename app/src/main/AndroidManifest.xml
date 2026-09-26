@@ -34,6 +34,10 @@
             android:label="@string/check_title"
             android:parentActivityName=".ui.MainActivity" />
 
+        <receiver
+            android:name=".install.InstallResultReceiver"
+            android:exported="false" />
+
     </application>
 
 </manifest>
