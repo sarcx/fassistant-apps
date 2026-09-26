@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0
+
+Every app in the list can be installed from its row.
+
+- Each row has one button: Install when the app is not on the phone, Update when its release is
+  newer, and Open when it is current. Tapping several queues them, and Android asks about each in
+  turn.
+- The row says how far the install has got, or why it stopped. The same two checks apply as for
+  this app's own update: the published checksum, and the Fassistant signing key.
+- Rows notice when an app is installed or removed, and update without spending a refresh.
+  Previously a row kept saying Install after the app had arrived, until the next refresh.
+- An app whose release does not name its package still gets Install, since installing over a copy
+  that is already there does no harm.
+
 ## 0.3.0
 
 The app can update itself.

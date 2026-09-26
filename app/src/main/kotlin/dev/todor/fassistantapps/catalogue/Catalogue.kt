@@ -102,17 +102,21 @@ object Catalogue {
         return CatalogueEntry(
             repo = repo,
             manifest = manifest,
-            installed = manifest?.packageName?.let { installedVersion(context, it) },
+            installed = installedVersion(context, manifest),
             problem = if (manifestText == null) "no release to read" else if (manifest == null) "its release could not be understood" else null,
         )
     }
+
+    /** The same entry with what is on the phone read again. Costs no request. */
+    fun rereadInstalled(context: Context, entry: CatalogueEntry) =
+        CatalogueEntry(entry.repo, entry.manifest, installedVersion(context, entry.manifest), entry.problem)
 
     /**
      * Every installed package is visible without QUERY_ALL_PACKAGES because this app targets 25,
      * which is one of the reasons it does.
      */
-    private fun installedVersion(context: Context, packageName: String): InstalledVersion? = try {
-        val info = context.packageManager.getPackageInfo(packageName, 0)
+    private fun installedVersion(context: Context, manifest: ReleaseManifest?): InstalledVersion? = try {
+        val info = context.packageManager.getPackageInfo(manifest?.packageName ?: return null, 0)
         InstalledVersion(info.versionName ?: "?", versionCodeOf(info))
     } catch (e: PackageManager.NameNotFoundException) {
         null
