@@ -36,8 +36,6 @@
     <string name="install_failed">The install failed: %1$s</string>
     <string name="install_checksum_failed">The download does not match the checksum its release published, so it was not installed. If a new release came out since the list was loaded, refresh and try again.</string>
     <string name="install_signature_failed">The download is not signed with the Fassistant key, so it was not installed.</string>
-    <string name="install_permission_needed">Allow this app to install apps, then come back and tap the button again.</string>
-
     <!-- Download check -->
     <string name="check_title">Download check</string>
     <string name="check_intro">GitHub serves release files from a host whose certificate Android 7.0 cannot verify on its own. This screen downloads a real release and reports what happened, so the phone answers the question rather than the documentation.</string>

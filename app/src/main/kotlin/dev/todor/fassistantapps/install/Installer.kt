@@ -6,9 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
 import android.content.pm.Signature
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
 import dev.todor.fassistantapps.R
 import dev.todor.fassistantapps.catalogue.Catalogue
 import dev.todor.fassistantapps.catalogue.CatalogueEntry
@@ -51,6 +48,12 @@ object Installer {
     /**
      * Opens a PackageInstaller session and commits it. A sideloaded app cannot install silently, so
      * this ends with Android's own confirmation, raised by [InstallResultReceiver].
+     *
+     * There is deliberately no check beforehand for permission to install apps. On Android 8 and
+     * later, canRequestPackageInstalls() answers false for any app targeting below 26 — this one
+     * targets 25 — however the setting is set, so asking first sends the user to the settings page
+     * on every tap. Android's own confirmation checks the real setting instead, and when it is off
+     * says so and links to it, then carries on with the install.
      */
     fun handOver(context: Context, apk: File) {
         val installer = context.packageManager.packageInstaller
@@ -75,18 +78,6 @@ object Installer {
         // The session holds its own copy now.
         apk.delete()
     }
-
-    /**
-     * Below Android 8 the permission is one switch for the whole phone, and it is already on: this
-     * app was itself sideloaded to get here.
-     */
-    fun canInstall(context: Context): Boolean =
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.O || context.packageManager.canRequestPackageInstalls()
-
-    /** Only reached when [canInstall] said no, which cannot happen below Android 8. */
-    @Suppress("InlinedApi")
-    fun permissionIntent(context: Context) =
-        Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${context.packageName}"))
 
     private fun signedLikeUs(context: Context, apk: File): Boolean {
         @Suppress("DEPRECATION")

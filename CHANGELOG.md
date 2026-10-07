@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.1
+
+Fixes Install and Update always opening the "Install unknown apps" settings page instead of
+installing, on Android 8 and later.
+
+Before installing, the app asked Android whether it was allowed to install apps. For an app that
+targets Android 7.1 or older, as this one deliberately does, Android answers no to that question
+whatever the setting says, so every tap went to the settings page and nothing was ever installed.
+The app no longer asks. It hands the download straight to Android's installer, which checks the
+real setting itself and, if it is off, says so, links to it and then carries on with the install.
+
 ## 0.4.0
 
 Every app in the list can be installed from its row.

@@ -21,7 +21,6 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
-import android.widget.Toast
 import dev.todor.fassistantapps.R
 import dev.todor.fassistantapps.catalogue.Catalogue
 import dev.todor.fassistantapps.catalogue.CatalogueEntry
@@ -192,12 +191,6 @@ class MainActivity : Activity() {
      * asks about each in turn.
      */
     private fun install(entry: CatalogueEntry) {
-        if (!Installer.canInstall(this)) {
-            Toast.makeText(this, R.string.install_permission_needed, Toast.LENGTH_LONG).show()
-            startActivity(Installer.permissionIntent(this))
-            return
-        }
-
         installing += entry.repo
         progress[entry.repo] = getString(R.string.install_downloading, entry.manifest!!.versionName)
         redraw()
