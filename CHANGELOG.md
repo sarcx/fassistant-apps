@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.2
+
+Fixes "INSTALL_FAILED_INTERNAL_ERROR: Permission Denied" on Xiaomi phones, where Install and Update
+downloaded the app and then failed.
+
+Xiaomi's Android, with its default "MIUI optimization" on, refuses the install route this app used,
+a PackageInstaller session, to ordinary apps. The only cure on the phone is a developer setting. The
+app now opens Android's own install screen on the download instead, which Xiaomi allows and every
+other phone handles the same way. The checksum and signing key are still checked first.
+
 ## 0.4.1
 
 Fixes Install and Update always opening the "Install unknown apps" settings page instead of

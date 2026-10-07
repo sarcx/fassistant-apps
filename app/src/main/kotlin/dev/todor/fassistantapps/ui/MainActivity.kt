@@ -108,6 +108,7 @@ class MainActivity : Activity() {
             addAction(Intent.ACTION_PACKAGE_REMOVED)
             addDataScheme("package")
         })
+        Installer.clearDownloads(this)
         refresh()
     }
 
@@ -196,9 +197,10 @@ class MainActivity : Activity() {
         redraw()
 
         worker.execute {
-            val outcome = runCatching { Installer.handOver(this, Installer.fetch(this, entry)) }
+            val outcome = runCatching { Installer.fetch(this, entry) }
             ui.post {
                 installing -= entry.repo
+                outcome.onSuccess { Installer.handOver(this, it) }
                 progress[entry.repo] = when (val problem = outcome.exceptionOrNull()) {
                     null -> getString(R.string.install_handed_over)
                     is Refused -> problem.message.orEmpty()

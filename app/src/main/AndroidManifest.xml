@@ -34,9 +34,13 @@
             android:label="@string/check_title"
             android:parentActivityName=".ui.MainActivity" />
 
-        <receiver
-            android:name=".install.InstallResultReceiver"
-            android:exported="false" />
+        <!-- Lets Android's install screen read a downloaded APK. Not exported: the install intent
+             grants read access to that one file and nothing else. -->
+        <provider
+            android:name=".install.ApkProvider"
+            android:authorities="${applicationId}.apks"
+            android:exported="false"
+            android:grantUriPermissions="true" />
 
     </application>
 
